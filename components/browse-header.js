@@ -5,7 +5,6 @@ import NextLink from "next/link";
 import { trim } from "lodash";
 
 import { theme } from "../theme";
-import axios, { post } from 'axios';
 
 // Convert simple links to next style href + as
 const Link = ({ to, children, basepath }) => (
@@ -47,7 +46,6 @@ class BrowseHeader extends React.Component<*> {
 
   fileUpload = file => {
     let formData = new FormData();
-    console.log('File', file)
     formData.append('file', file)
     const url = window.location.origin + '/api/contents/' 
     return fetch(url, {
