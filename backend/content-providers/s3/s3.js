@@ -155,8 +155,9 @@ function createS3Service(config: Object) {
   const uploadObject = (path: string, body: mixed, callback: Function) => {
     s3.upload(
       {
-        Key: s3Prefix(path),
-        Body: JSON.stringify(body)
+        Bucket: s3.config.params.Bucket,
+        Key: body.name,
+        Body: body.data
       },
       (err, data) => {
         if (err) callback(err);

@@ -5,6 +5,7 @@ import NextLink from "next/link";
 import { trim } from "lodash";
 
 import { theme } from "../theme";
+import axios, { post } from 'axios';
 
 // Convert simple links to next style href + as
 const Link = ({ to, children, basepath }) => (
@@ -31,6 +32,29 @@ class BrowseHeader extends React.Component<*> {
   handleItemClick = (e: SyntheticEvent<*>, { name }: { name: string }) => {
     Router.push(name);
   };
+
+  onFormSubmit = (e) => {
+    e.preventDefault() // Stop form submit
+    console.log(this.state)
+    this.fileUpload(this.state.file).then((response)=>{
+      window.location.reload();
+    })
+  }
+
+  onChange = (e) => {
+    this.setState({file:e.target.files[0]})
+  }
+
+  fileUpload = file => {
+    let formData = new FormData();
+    console.log('File', file)
+    formData.append('file', file)
+    const url = window.location.origin + '/api/contents/' 
+    return fetch(url, {
+      method: 'POST',
+      body: formData,
+    });
+  }
 
   render() {
     const { path, basepath } = this.props;
@@ -69,7 +93,17 @@ class BrowseHeader extends React.Component<*> {
             );
           })}
         </ul>
-        {this.props.type === "directory" ? null : (
+        {this.props.type === "directory" ? (
+              <div>
+                <form onSubmit={this.onFormSubmit}>
+                  <div className="button-wrapper">
+                    <span className="label">Upload File</span>
+                    <input type="file" name="upload" id="upload" className="upload-box" onChange={this.onChange} placeholder="Upload File" />
+                  </div>
+                  <button className="ops" type="submit">Upload</button>
+                </form>
+              </div>
+        ) : (
           <React.Fragment>
             {this.props.commuterExecuteLink && viewingNotebook ? (
               <a
@@ -162,6 +196,39 @@ class BrowseHeader extends React.Component<*> {
 
           .ops:not(:last-child) {
             margin-right: 10px;
+          }
+
+          .button-wrapper {
+            position: relative;
+            width: 150px;
+            text-align: center;
+            display: inline-block;
+            margin-right: 24px;
+          }
+          
+          .button-wrapper span.label {
+            position: relative;
+            z-index: 0;
+            display: inline-block;
+            width: 100%;
+            background: #324767;
+            cursor: pointer;
+            color: #fff;
+            padding: 10px 0;
+            text-transform:uppercase;
+            font-size:12px;
+          }
+          
+          #upload {
+              display: inline-block;
+              position: absolute;
+              z-index: 1;
+              width: 100%;
+              height: 50px;
+              top: 0;
+              left: 0;
+              opacity: 0;
+              cursor: pointer;
           }
         `}</style>
       </nav>

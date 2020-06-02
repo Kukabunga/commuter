@@ -51,12 +51,17 @@ function createRouter(config: Object): express.Router {
   });
 
   router.post("/*", (req: $Request, res: $Response) => {
-    const path = req.params["0"];
+    const path = req.params["0"]
+    const data = {
+      data: req.files.file.data,
+      name: req.files.file.name,
+      path: path
+    }
     const cb = err => {
       if (err) res.status(500).json(errObject(err, path));
       else res.status(201).send();
     };
-    s3Service.uploadObject(path, req.body, cb);
+    s3Service.uploadObject(path, data, cb);
   });
 
   return router;

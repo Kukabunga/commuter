@@ -4,8 +4,9 @@ import type { $Request, $Response } from "express";
 
 const { parse } = require("url");
 const http = require("http");
-
+const fileUpload = require('express-fileupload');
 const express = require("express");
+const { createProxyMiddleware } = require('http-proxy-middleware');
 const morgan = require("morgan");
 const log = require("log");
 
@@ -73,6 +74,7 @@ function createServer() {
 
     router.get(["/view", "/view*"], viewHandler);
     router.get("*", passToNext);
+    app.use(fileUpload());
 
     // TODO: Leaving this here for the eventual baseURL handling
     const baseURI = "/";
@@ -80,7 +82,7 @@ function createServer() {
     // TODO: This is duplicate until we're doing proper baseURL handling
     app.get(["/view", "/view*"], viewHandler);
     app.use(passToNext);
-
+    app.use('/api', createProxyMiddleware({ target: 'http://localhost:4000/', changeOrigin: true }));
     const server = http.createServer(app);
 
     return new Promise(accept => {
